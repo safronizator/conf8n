@@ -36,7 +36,7 @@ type ValueIterator struct {
 
 type EmptyIterator struct{}
 
-// Base constructor config. Requires config data to be prepared as map[string]interface{}
+// Base constructor for Config struct. Requires config data to be prepared as map[string]interface{}
 // For most cases you can use more high-level constructors (see docs for NewConfigFromYaml(),
 // NewConfigFromJson() and NewConfigFromFile())
 func NewConfig(fromData map[string]interface{}) *Config {
