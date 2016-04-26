@@ -176,7 +176,8 @@ func (v *ConfigValue) Count() int {
 	return 0
 }
 
-// Returns iterator for the value (if it was set as array)
+// Returns iterator for the value (if it was set as array).
+//
 // Example:
 // 	for i := config.Get("myArrayValue").Iterate(); !i.Finished(); i.Next() {
 // 		fmt.Println(i.Value)
