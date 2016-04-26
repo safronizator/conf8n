@@ -180,7 +180,7 @@ func (v *ConfigValue) Count() int {
 //
 // Example:
 // 	for i := config.Get("myArrayValue").Iterate(); !i.Finished(); i.Next() {
-// 		fmt.Println(i.Value)
+// 		fmt.Println(i.Value())
 // 	}
 func (v *ConfigValue) Iterate() Iterator {
 	if a, ok := v.v.([]interface{}); ok {
