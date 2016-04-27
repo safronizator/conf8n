@@ -58,6 +58,21 @@ func (v *ConfigValue) IsSet() bool {
 	return v.v != nil
 }
 
+// Returns true if value can be interpreted as slice
+func (v *ConfigValue) IsSlice() bool {
+	_, is := v.v.([]interface{})
+	return is
+}
+
+// Returns true if value can be interpreted as map
+func (v *ConfigValue) IsMap() bool {
+	if _, is := v.v.(map[string]interface{}); is {
+		return true
+	}
+	_, is := v.v.(map[interface{}]interface{})
+	return is
+}
+
 // Silently converts value to int - even if key was not set in config
 func (v *ConfigValue) Int() int {
 	i, _ := v.v.(int)
@@ -206,14 +221,17 @@ func (i *ValueIterator) Value() *ConfigValue {
 	return &ConfigValue{i.a[i.i]}
 }
 
+// No action here
 func (i *EmptyIterator) Next() {
 	//pass
 }
 
+// Always return empty value
 func (i *EmptyIterator) Value() *ConfigValue {
 	return &ConfigValue{nil}
 }
 
+// Always return true
 func (i *EmptyIterator) Finished() bool {
 	return true
 }
