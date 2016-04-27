@@ -1,6 +1,6 @@
 // Package conf8n is here to simplify the way you work with your config files.
-// It helps to avoid type-casting-hell in your projects. Now you can load, read and traverse
-// even complicated hierarchical configs a clear & simple way.
+// It helps to avoid type-casting-hell, which occurs when you trying to parse your config files manually.
+// Now you can load, read and traverse even complicated hierarchical configs a clear & simple way.
 package conf8n
 
 import (
@@ -25,25 +25,32 @@ type ConfigValue struct {
 
 type Iterator interface {
 	Next()
-	Value() *ConfigValue
 	Finished() bool
+	Index() int
+	Key() string
+	Value() *ConfigValue
 }
 
-type ValueIterator struct {
+type ListIterator struct {
 	a []interface{}
 	i int
 }
 
+type MapIterator struct {
+	*ListIterator
+	m map[string]interface{}
+}
+
 type EmptyIterator struct{}
 
-// Base constructor for Config struct. Requires config data to be prepared as map[string]interface{}
+// Base constructor for Config struct. Requires config data to be prepared as map[string]interface{}.
 // For most cases you can use more high-level constructors (see docs for NewConfigFromYaml(),
 // NewConfigFromJson() and NewConfigFromFile())
 func NewConfig(fromData map[string]interface{}) *Config {
 	return &Config{data: fromData}
 }
 
-// Get value by given key
+// Get value by given key.
 // Supports nested keys: for example, key "db.user" could be interpreted as is, if set;
 // if not - system will lookup for value with key "user" in section with key "db"
 func (c *Config) Get(key string) *ConfigValue {
@@ -193,32 +200,60 @@ func (v *ConfigValue) Count() int {
 
 // Returns iterator for the value (if it was set as array).
 //
-// Example:
+// Example 1 (array key iteration):
 // 	for i := config.Get("myArrayValue").Iterate(); !i.Finished(); i.Next() {
 // 		fmt.Println(i.Value())
 // 	}
+//
+// Example 2 (map key iteration):
+// 	for i := config.Get("myMapValue").Iterate(); !i.Finished(); i.Next() {
+// 		fmt.Println(i.Key(), ":", i.Value())
+// 	}
 func (v *ConfigValue) Iterate() Iterator {
 	if a, ok := v.v.([]interface{}); ok {
-		return &ValueIterator{a, 0}
+		return &ListIterator{a, 0}
+	}
+	if m := toStrMap(v.v); m != nil {
+		return &MapIterator{&ListIterator{mapGetKeys(m), 0}, m}
 	}
 	return &EmptyIterator{}
 }
 
-// See doc for Iterate()
-func (i *ValueIterator) Next() {
+// See doc for ConfigValue.Iterate()
+func (i *ListIterator) Next() {
 	if !i.Finished() {
 		i.i++
 	}
 }
 
-// See doc for Iterate()
-func (i *ValueIterator) Finished() bool {
+// See doc for ConfigValue.Iterate()
+func (i *ListIterator) Finished() bool {
 	return i.i == len(i.a)
 }
 
-// See doc for Iterate()
-func (i *ValueIterator) Value() *ConfigValue {
+// See doc for ConfigValue.Iterate()
+func (i *ListIterator) Value() *ConfigValue {
 	return &ConfigValue{i.a[i.i]}
+}
+
+// Returns current iteration index
+func (i *ListIterator) Index() int {
+	return i.i
+}
+
+// Always return empty string
+func (i *ListIterator) Key() string {
+	return ""
+}
+
+// See doc for ConfigValue.Iterate()
+func (i *MapIterator) Value() *ConfigValue {
+	return &ConfigValue{i.m[i.Key()]}
+}
+
+// Return current key
+func (i *MapIterator) Key() string {
+	return i.ListIterator.Value().String()
 }
 
 // No action here
@@ -234,4 +269,22 @@ func (i *EmptyIterator) Value() *ConfigValue {
 // Always return true
 func (i *EmptyIterator) Finished() bool {
 	return true
+}
+
+// Always return 0
+func (i *EmptyIterator) Index() int {
+	return 0
+}
+
+// Always return empty string
+func (i *EmptyIterator) Key() string {
+	return ""
+}
+
+func mapGetKeys(m map[string]interface{}) []interface{} {
+	a := make([]interface{}, 0, len(m))
+	for k, _ := range m {
+		a = append(a, k)
+	}
+	return a
 }
