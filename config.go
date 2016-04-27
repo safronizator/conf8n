@@ -122,7 +122,7 @@ func (v *ConfigValue) MustInt() (int, error) {
 	if i, ok := v.v.(int); ok {
 		return i, nil
 	}
-	return 0, fmt.Errorf("Value is not int")
+	return 0, fmt.Errorf("Value is not int: %v", v.v)
 }
 
 // Tries to cast value to string; reports error if key was not set or it was non string
@@ -133,7 +133,7 @@ func (v *ConfigValue) MustString() (string, error) {
 	if s, ok := v.v.(string); ok {
 		return s, nil
 	}
-	return "", fmt.Errorf("Value is not string")
+	return "", fmt.Errorf("Value is not string: %v", v.v)
 }
 
 // Tries to cast value to float; reports error if key was not set or it was non float
@@ -144,7 +144,7 @@ func (v *ConfigValue) MustFloat() (float64, error) {
 	if f, ok := v.v.(float64); ok {
 		return f, nil
 	}
-	return .0, fmt.Errorf("Value is not float")
+	return .0, fmt.Errorf("Value is not float: %v", v.v)
 }
 
 // Tries to cast value to bool; reports error if key was not set or it was non bool
@@ -155,7 +155,7 @@ func (v *ConfigValue) MustBool() (bool, error) {
 	if b, ok := v.v.(bool); ok {
 		return b, nil
 	}
-	return false, fmt.Errorf("Value is not bool")
+	return false, fmt.Errorf("Value is not bool: %v", v.v)
 }
 
 // Tries to cast value to int. If it was not set, or can't be casted, returns given default value
