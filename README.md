@@ -20,18 +20,18 @@ func main() {
 		panic(err)
 	}
 	db := somedb.Connect(
-	  conf.Get("db.host").DefString("127.0.0.1"),
-	  conf.Get("db.port").DefInt(3306))
+		conf.Get("db.host").DefString("127.0.0.1"),
+		conf.Get("db.port").DefInt(3306))
 	accConf := conf.Get("db.account").Config()
 	login := accConf.Get("login")
 	pwd := accConf.Get("password")
 	if !login.IsSet() || !pwd.IsSet() {
-	  panic("invalid account data")
+	  	panic("invalid account data")
 	}
 	db.Auth(login.String(), password.String())
 	fmt.Println("Authorized tables:")
 	for i := conf.Get("db.tables").Iterate(); !i.Finished(); i.Next() {
-	  fmt.Println(i.Value())
+	  	fmt.Println(i.Value())
 	}
 }
 ```
