@@ -15,13 +15,20 @@ import (
 )
 
 func main() {
+	// myconf.yaml:
+	// db:
+	//   host: 192.168.0.1
+	//   account:
+	//     login: db_user
+	//     password: xxxxxxx
+	//   tables: ["posts", "comments", "likes"]
 	conf, err := conf8n.NewConfigFromFile("myconf.yaml")
 	if err != nil {
 		panic(err)
 	}
 	db := somedb.Connect(
-		conf.Get("db.host").DefString("127.0.0.1"),
-		conf.Get("db.port").DefInt(3306))
+		conf.Get("db.host").DefString("127.0.0.1"), // "192.168.0.1"
+		conf.Get("db.port").DefInt(3306))           // 3306
 	accConf := conf.Get("db.account").Config()
 	login := accConf.Get("login")
 	pwd := accConf.Get("password")
