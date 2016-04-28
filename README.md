@@ -45,7 +45,7 @@ func main() {
 
 ## Docs
 
-API: https://godoc.org/github.com/safronizator/conf8n
+[![GoDoc](https://godoc.org/github.com/safronizator/conf8n?status.svg)](https://godoc.org/github.com/safronizator/conf8n)
 
 ## @todo
 - docs & examples
